@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StorePro Training — Sales Academy Demo</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f2ed; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  #app { display: flex; height: 620px; width: 100%; max-width: 900px; border: 1px solid #ddd; border-radius: 14px; overflow: hidden; background: #fff; box-shadow: 0 4px 32px rgba(0,0,0,0.10); }
+  .sidebar { width: 220px; min-width: 220px; background: #f7f5f0; border-right: 1px solid #e8e5df; display: flex; flex-direction: column; padding: 16px 0; }
+  .sidebar-logo { padding: 0 16px 16px; border-bottom: 1px solid #e8e5df; margin-bottom: 8px; }
+  .logo-mark { display: flex; align-items: center; gap: 8px; }
+  .logo-icon { width: 30px; height: 30px; background: #BA7517; border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+  .logo-icon svg { width: 17px; height: 17px; }
+  .logo-text { font-size: 13px; font-weight: 600; color: #1a1a1a; line-height: 1.2; }
+  .logo-sub { font-size: 10px; color: #888; letter-spacing: 0.05em; text-transform: uppercase; }
+  .nav-section { padding: 6px 8px; }
+  .nav-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #aaa; padding: 8px 8px 4px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; color: #666; transition: all 0.15s; }
+  .nav-item:hover { background: #fff; color: #1a1a1a; }
+  .nav-item.active { background: #fff; color: #1a1a1a; font-weight: 600; }
+  .nav-item.active .nav-dot { background: #BA7517; }
+  .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: #ccc; flex-shrink: 0; }
+  .nav-badge { margin-left: auto; font-size: 10px; background: #BA7517; color: white; border-radius: 10px; padding: 1px 6px; }
+  .sidebar-user { margin-top: auto; padding: 12px 16px 0; border-top: 1px solid #e8e5df; }
+  .user-row { display: flex; align-items: center; gap: 8px; }
+  .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #E1F5EE; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #0F6E56; }
+  .user-name { font-weight: 600; color: #1a1a1a; font-size: 12px; }
+  .user-info { font-size: 11px; color: #888; line-height: 1.4; }
+  .main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+  .view { display: none; flex-direction: column; height: 100%; }
+  .view.active { display: flex; }
+  .top-bar { padding: 14px 20px; border-bottom: 1px solid #ebebeb; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .page-title { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+  .page-sub { font-size: 12px; color: #888; margin-top: 1px; }
+  .progress-pill { font-size: 11px; background: #EAF3DE; color: #3B6D11; border-radius: 20px; padding: 3px 10px; font-weight: 600; }
+  .content-pad { padding: 20px; flex: 1; overflow-y: auto; }
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+  .stat-card { background: #f7f5f0; border-radius: 8px; padding: 12px 14px; }
+  .stat-label { font-size: 11px; color: #888; margin-bottom: 4px; }
+  .stat-val { font-size: 22px; font-weight: 600; color: #1a1a1a; }
+  .stat-unit { font-size: 11px; color: #aaa; }
+  .section-title { font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+  .course-card { background: #fff; border: 1px solid #ebebeb; border-radius: 12px; padding: 12px 14px; cursor: pointer; transition: border-color 0.15s; margin-bottom: 8px; }
+  .course-card:hover { border-color: #BA7517; }
+  .course-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .course-icon { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .course-meta { flex: 1; min-width: 0; }
+  .course-title { font-size: 13px; font-weight: 600; color: #1a1a1a; }
+  .course-info { font-size: 11px; color: #888; margin-top: 2px; }
+  .course-status { font-size: 11px; border-radius: 20px; padding: 2px 8px; font-weight: 600; flex-shrink: 0; }
+  .status-done { background: #EAF3DE; color: #3B6D11; }
+  .status-progress { background: #FAEEDA; color: #854F0B; }
+  .status-locked { background: #f0f0f0; color: #aaa; }
+  .progress-bar-wrap { background: #f0f0f0; border-radius: 4px; height: 3px; }
+  .progress-bar-fill { height: 3px; border-radius: 4px; background: #BA7517; }
+  .scenario-card { border: 1px solid #ebebeb; border-radius: 12px; padding: 14px; cursor: pointer; transition: all 0.15s; background: #fff; margin-bottom: 10px; }
+  .scenario-card:hover { border-color: #BA7517; }
+  .scenario-card.selected { border-color: #BA7517; border-width: 2px; }
+  .scenario-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 6px; }
+  .scenario-name { font-size: 13px; font-weight: 600; color: #1a1a1a; }
+  .scenario-desc { font-size: 12px; color: #666; line-height: 1.5; }
+  .diff-badge { font-size: 10px; border-radius: 20px; padding: 2px 8px; font-weight: 600; white-space: nowrap; }
+  .diff-beginner { background: #EAF3DE; color: #3B6D11; }
+  .diff-inter { background: #FAEEDA; color: #854F0B; }
+  .start-btn { width: 100%; margin-top: 10px; padding: 10px; background: #BA7517; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+  .start-btn:hover { opacity: 0.88; }
+  .chat-view { display: none; flex-direction: column; height: 100%; }
+  .chat-view.active { display: flex; }
+  .chat-top { padding: 12px 16px; border-bottom: 1px solid #ebebeb; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .customer-avatar { width: 34px; height: 34px; border-radius: 50%; background: #FAEEDA; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #854F0B; flex-shrink: 0; }
+  .customer-name { font-size: 13px; font-weight: 600; color: #1a1a1a; }
+  .customer-context { font-size: 11px; color: #888; }
+  .exchange-count { font-size: 11px; color: #888; margin-left: auto; }
+  .back-btn { font-size: 12px; color: #666; cursor: pointer; padding: 5px 10px; border-radius: 7px; border: 1px solid #ddd; white-space: nowrap; }
+  .back-btn:hover { background: #f7f5f0; }
+  .messages-area { flex: 1; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .msg { max-width: 75%; display: flex; flex-direction: column; gap: 3px; }
+  .msg.user { align-self: flex-end; align-items: flex-end; }
+  .msg.assistant { align-self: flex-start; align-items: flex-start; }
+  .msg-label { font-size: 10px; color: #aaa; padding: 0 4px; }
+  .bubble { padding: 9px 13px; border-radius: 14px; font-size: 13px; line-height: 1.55; }
+  .msg.user .bubble { background: #BA7517; color: white; border-bottom-right-radius: 3px; }
+  .msg.assistant .bubble { background: #f7f5f0; color: #1a1a1a; border: 1px solid #ebebeb; border-bottom-left-radius: 3px; }
+  .typing-bubble { display: flex; gap: 4px; align-items: center; padding: 11px 14px; background: #f7f5f0; border-radius: 14px; border-bottom-left-radius: 3px; border: 1px solid #ebebeb; }
+  .dot { width: 5px; height: 5px; border-radius: 50%; background: #aaa; animation: bounce 1.2s infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+  .hint-bar { padding: 7px 16px; background: #FAEEDA; border-top: 1px solid #FAC775; font-size: 11px; color: #854F0B; flex-shrink: 0; }
+  .chat-input-area { padding: 10px 16px; border-top: 1px solid #ebebeb; display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0; }
+  .chat-input { flex: 1; resize: none; border: 1px solid #ddd; border-radius: 8px; padding: 8px 12px; font-size: 13px; font-family: inherit; outline: none; background: #fff; color: #1a1a1a; min-height: 36px; max-height: 80px; overflow-y: auto; }
+  .chat-input:focus { border-color: #BA7517; }
+  .send-btn { padding: 8px 16px; background: #BA7517; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: opacity 0.15s; height: 36px; }
+  .send-btn:hover { opacity: 0.88; }
+  .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .score-panel { padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; flex: 1; }
+  .score-header { text-align: center; padding: 16px; }
+  .score-num { font-size: 54px; font-weight: 700; color: #BA7517; line-height: 1; }
+  .score-denom { font-size: 18px; color: #aaa; }
+  .score-label { font-size: 13px; color: #888; margin-top: 6px; }
+  .feedback-section { background: #f7f5f0; border-radius: 10px; padding: 14px; }
+  .feedback-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #888; margin-bottom: 8px; }
+  .feedback-item { font-size: 13px; color: #1a1a1a; line-height: 1.5; padding: 4px 0; display: flex; gap: 8px; align-items: flex-start; }
+  .fi-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .fi-green { background: #639922; }
+  .fi-red { background: #E24B4A; }
+  .retry-btn { padding: 11px; background: #BA7517; color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; width: 100%; font-weight: 600; }
+  .retry-btn:hover { opacity: 0.88; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1" y="7" width="14" height="8" rx="1" fill="white" opacity="0.9"/>
+            <rect x="3" y="3" width="10" height="5" rx="1" fill="white" opacity="0.6"/>
+            <rect x="6" y="9" width="4" height="3" rx="0.5" fill="#BA7517"/>
+          </svg>
+        </div>
+        <div><div class="logo-text">StorePro Training</div><div class="logo-sub">Sales Academy</div></div>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Menu</div>
+      <div class="nav-item active" onclick="showView('dashboard')"><div class="nav-dot"></div> Dashboard</div>
+      <div class="nav-item" onclick="showView('courses')"><div class="nav-dot"></div> Courses<span class="nav-badge">7</span></div>
+      <div class="nav-item" onclick="showView('roleplay')"><div class="nav-dot"></div> Roleplay Practice<span class="nav-badge">3</span></div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-row">
+        <div class="user-avatar">JD</div>
+        <div class="user-info"><div class="user-name">Jamie Davis</div><div>StoreSmart Fresno</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="view active" id="view-dashboard">
+      <div class="top-bar">
+        <div><div class="page-title">Welcome back, Jamie</div><div class="page-sub">Continue your sales training</div></div>
+        <div class="progress-pill">3 / 7 complete</div>
+      </div>
+      <div class="content-pad">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Courses done</div><div class="stat-val">3 <span class="stat-unit">/ 7</span></div></div>
+          <div class="stat-card"><div class="stat-label">Roleplay score</div><div class="stat-val">78 <span class="stat-unit">avg</span></div></div>
+          <div class="stat-card"><div class="stat-label">Sessions</div><div class="stat-val">12 <span class="stat-unit">total</span></div></div>
+        </div>
+        <div class="section-title">Up next</div>
+        <div class="course-card" onclick="showView('courses')">
+          <div class="course-header">
+            <div class="course-icon" style="background:#FAEEDA;">📦</div>
+            <div class="course-meta"><div class="course-title">Module 4: Objection Handling</div><div class="course-info">5 lessons · 22 min</div></div>
+            <div class="course-status status-progress">In progress</div>
+          </div>
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:40%;"></div></div>
+        </div>
+        <div class="section-title" style="margin-top:16px;">Practice a scenario</div>
+        <div class="scenario-card selected" onclick="showView('roleplay')">
+          <div class="scenario-top"><div class="scenario-name">New customer walk-in</div><span class="diff-badge diff-beginner">Beginner</span></div>
+          <div class="scenario-desc">A first-time visitor exploring unit options. Practice qualifying questions, unit recommendations, and closing.</div>
+        </div>
+      </div>
+    </div>
+    <div class="view" id="view-courses">
+      <div class="top-bar">
+        <div><div class="page-title">Sales Curriculum</div><div class="page-sub">Storage facility sales training</div></div>
+        <div class="progress-pill">3 / 7 complete</div>
+      </div>
+      <div class="content-pad">
+        <div class="course-card"><div class="course-header"><div class="course-icon" style="background:#EAF3DE;">🎯</div><div class="course-meta"><div class="course-title">Module 1: The Storage Sales Mindset</div><div class="course-info">4 lessons · 15 min</div></div><div class="course-status status-done">Complete</div></div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:100%;background:#639922;"></div></div></div>
+        <div class="course-card"><div class="course-header"><div class="course-icon" style="background:#E6F1FB;">📐</div><div class="course-meta"><div class="course-title">Module 2: Unit Types &amp; Pricing</div><div class="course-info">6 lessons · 28 min</div></div><div class="course-status status-done">Complete</div></div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:100%;background:#639922;"></div></div></div>
+        <div class="course-card"><div class="course-header"><div class="course-icon" style="background:#EAF3DE;">📞</div><div class="course-meta"><div class="course-title">Module 3: Phone &amp; Walk-in Inquiries</div><div class="course-info">5 lessons · 20 min</div></div><div class="course-status status-done">Complete</div></div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:100%;background:#639922;"></div></div></div>
+        <div class="course-card"><div class="course-header"><div class="course-icon" style="background:#FAEEDA;">🛡️</div><div class="course-meta"><div class="course-title">Module 4: Objection Handling</div><div class="course-info">5 lessons · 22 min</div></div><div class="course-status status-progress">40% done</div></div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:40%;"></div></div></div>
+        <div class="course-card" style="opacity:0.55;"><div class="course-header"><div class="course-icon" style="background:#f0f0f0;">🔒</div><div class="course-meta"><div class="course-title">Module 5: Closing Techniques</div><div class="course-info">4 lessons · 18 min</div></div><div class="course-status status-locked">Locked</div></div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:0%;"></div></div></div>
+        <div class="course-card" style="opacity:0.55;"><div class="course-header"><div class="course-icon" style="background:#f0f0f0;">🔒</div><div class="course-meta"><div class="course-title">Module 6: Upselling Insurance &amp; Supplies</div><div class="course-info">3 lessons · 14 min</div></div><div class="course-status status-locked">Locked</div></div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:0%;"></div></div></div>
+        <div class="course-card" style="opacity:0.55;"><div class="course-header"><div class="course-icon" style="background:#f0f0f0;">🔒</div><div class="course-meta"><div class="course-title">Module 7: Difficult Customer Scenarios</div><div class="course-info">6 lessons · 30 min</div></div><div class="course-status status-locked">Locked</div></div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:0%;"></div></div></div>
+      </div>
+    </div>
+    <div class="view" id="view-roleplay">
+      <div class="top-bar">
+        <div><div class="page-title">Roleplay Practice</div><div class="page-sub">AI-powered sales simulations</div></div>
+      </div>
+      <div class="content-pad">
+        <div class="section-title" style="margin-bottom:12px;">Choose a scenario</div>
+        <div class="scenario-card selected">
+          <div class="scenario-top"><div class="scenario-name">New customer walk-in</div><span class="diff-badge diff-beginner">Beginner</span></div>
+          <div class="scenario-desc">A first-time visitor exploring unit options. Practice qualifying questions, matching unit sizes, and closing the rental.</div>
+        </div>
+        <div class="scenario-card" style="opacity:0.5;cursor:not-allowed;">
+          <div class="scenario-top"><div class="scenario-name">Rate increase complaint</div><span class="diff-badge diff-inter">Intermediate</span></div>
+          <div class="scenario-desc">An upset customer calling about a price increase. Available in Pro plan.</div>
+        </div>
+        <div class="scenario-card" style="opacity:0.5;cursor:not-allowed;">
+          <div class="scenario-top"><div class="scenario-name">Phone lead to rental</div><span class="diff-badge diff-inter">Intermediate</span></div>
+          <div class="scenario-desc">Convert an online inquiry into a booked rental. Available in Pro plan.</div>
+        </div>
+        <button class="start-btn" onclick="startRoleplay()">Start roleplay — New customer walk-in</button>
+      </div>
+    </div>
+    <div class="chat-view" id="chat-view">
+      <div class="chat-top">
+        <div class="back-btn" onclick="endChat()">← Back</div>
+        <div class="customer-avatar">SC</div>
+        <div class="customer-info"><div class="customer-name">Sarah Chen</div><div class="customer-context">Walk-in customer · Needs storage in 2 weeks</div></div>
+        <div class="exchange-count" id="exchange-count">0 / 10 exchanges</div>
+      </div>
+      <div class="hint-bar" id="hint-bar">💡 Tip: Greet Sarah, find out what she needs to store, and recommend the right unit size.</div>
+      <div class="messages-area" id="messages-area"></div>
+      <div class="chat-input-area">
+        <textarea class="chat-input" id="chat-input" placeholder="Type your response as the sales rep..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+    <div class="chat-view" id="score-view">
+      <div class="chat-top">
+        <div class="back-btn" onclick="showView('roleplay')">← Scenarios</div>
+        <div style="font-size:14px;font-weight:600;color:#1a1a1a;">Session Complete</div>
+      </div>
+      <div class="score-panel" id="score-panel"></div>
+    </div>
+  </div>
+</div>
+<script>
+const SYSTEM_PROMPT = `You are SARAH CHEN, a potential customer who has just walked into a self-storage facility. You are roleplaying as a real customer for a sales training exercise.
+
+BACKGROUND:
+- You are moving out of a 3-bedroom house in 2 weeks
+- You have furniture (couch, bed frames, dining table), about 30 boxes, and some sports equipment (bikes, kayak)
+- You've never rented storage before — you don't know unit sizes
+- You are budget-conscious but will pay for the right solution (max ~$180/month)
+- You're friendly but a bit anxious about the move
+
+YOUR BEHAVIOR:
+- Start by saying you're just looking and need help figuring out what size unit you need
+- Ask questions naturally (what sizes are available? what's the cost? is it climate controlled? how does access work?)
+- If the rep asks good qualifying questions, warm up and engage
+- If the rep just lists prices without asking about your needs, seem confused and overwhelmed
+- If the rep recommends a unit confidently with a reason, become interested
+- If the rep tries to upsell insurance, consider it if they explain the value
+- After 9-10 exchanges, if things went well, say you'd like to move forward; if not, say you'll think about it
+
+SCORING (internal, do not reveal):
+1. Greeted warmly (+1)
+2. Asked qualifying questions about what you're storing (+2)
+3. Recommended correct size 10x20 or 10x25 for a 3BR house with reasoning (+2)
+4. Mentioned climate control or security (+1)
+5. Handled your budget concern (+1)
+6. Attempted to close / next steps (+2)
+7. Offered insurance or packing supplies (+1)
+
+ENDING THE SESSION:
+After exactly 10 exchanges, output ONLY this JSON on its own line:
+{"score": X, "strengths": ["...", "..."], "improvements": ["...", "..."], "summary": "..."}
+
+Replace X with score 1-10. Stay fully in character as Sarah until then.`;
+
+let messages = [];
+let exchangeCount = 0;
+let isLoading = false;
+let sessionDone = false;
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  const items = document.querySelectorAll('.nav-item');
+  const map = { dashboard: 0, courses: 1, roleplay: 2 };
+  if (map[name] !== undefined) items[map[name]].classList.add('active');
+}
+
+function startRoleplay() {
+  messages = [];
+  exchangeCount = 0;
+  sessionDone = false;
+  document.getElementById('messages-area').innerHTML = '';
+  document.getElementById('exchange-count').textContent = '0 / 10 exchanges';
+  document.getElementById('chat-input').value = '';
+  document.getElementById('hint-bar').style.display = '';
+  document.querySelectorAll('.view, .chat-view').forEach(v => v.classList.remove('active'));
+  document.getElementById('chat-view').classList.add('active');
+  addMessage('assistant', "Hi there! Welcome. Is there something I can help you with today, or are you just looking around?");
+  messages.push({ role: 'assistant', content: "Hi there! Welcome. Is there something I can help you with today, or are you just looking around?" });
+}
+
+function endChat() {
+  document.querySelectorAll('.chat-view').forEach(v => v.classList.remove('active'));
+  showView('roleplay');
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 80) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function addMessage(role, text) {
+  const area = document.getElementById('messages-area');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  const label = document.createElement('div');
+  label.className = 'msg-label';
+  label.textContent = role === 'user' ? 'You (sales rep)' : 'Sarah Chen (customer)';
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.textContent = text;
+  div.appendChild(label);
+  div.appendChild(bubble);
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+}
+
+function showTyping() {
+  const area = document.getElementById('messages-area');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg assistant';
+  wrap.id = 'typing-indicator';
+  const label = document.createElement('div');
+  label.className = 'msg-label';
+  label.textContent = 'Sarah Chen (customer)';
+  const bubble = document.createElement('div');
+  bubble.className = 'typing-bubble';
+  bubble.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+  wrap.appendChild(label);
+  wrap.appendChild(bubble);
+  area.appendChild(wrap);
+  area.scrollTop = area.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+async function sendMessage() {
+  if (isLoading || sessionDone) return;
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  exchangeCount++;
+  document.getElementById('exchange-count').textContent = exchangeCount + ' / 10 exchanges';
+  addMessage('user', text);
+  messages.push({ role: 'user', content: text });
+  if (exchangeCount >= 5) document.getElementById('hint-bar').style.display = 'none';
+  isLoading = true;
+  document.getElementById('send-btn').disabled = true;
+  showTyping();
+  try {
+    const response = await fetch('https://storepro-backend.onrender.com/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system: SYSTEM_PROMPT, messages: messages })
+    });
+    const data = await response.json();
+    removeTyping();
+    if (data.error) {
+      addMessage('assistant', '[API error: ' + data.error.message + ']');
+      isLoading = false;
+      document.getElementById('send-btn').disabled = false;
+      return;
+    }
+    const replyText = data.content[0].text;
+    const jsonMatch = replyText.match(/\{[\s\S]*"score"[\s\S]*\}/);
+    if (jsonMatch) {
+      sessionDone = true;
+      const conversationalPart = replyText.replace(jsonMatch[0], '').trim();
+      if (conversationalPart) { addMessage('assistant', conversationalPart); messages.push({ role: 'assistant', content: conversationalPart }); }
+      try { setTimeout(() => showScore(JSON.parse(jsonMatch[0])), 800); } catch(e) {}
+    } else {
+      addMessage('assistant', replyText);
+      messages.push({ role: 'assistant', content: replyText });
+    }
+    if (exchangeCount >= 10 && !sessionDone) { sessionDone = true; setTimeout(() => requestScore(), 600); }
+  } catch(err) {
+    removeTyping();
+    addMessage('assistant', '[Connection error — please try again]');
+  }
+  isLoading = false;
+  document.getElementById('send-btn').disabled = false;
+}
+
+async function requestScore() {
+  try {
+    const evalMessages = [...messages, { role: 'user', content: 'Please end the session now and provide your JSON score evaluation.' }];
+    const response = await fetch('https://storepro-backend.onrender.com/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 500, system: SYSTEM_PROMPT, messages: evalMessages })
+    });
+    const data = await response.json();
+    const jsonMatch = data.content[0].text.match(/\{[\s\S]*"score"[\s\S]*\}/);
+    if (jsonMatch) showScore(JSON.parse(jsonMatch[0]));
+  } catch(e) {}
+}
+
+function showScore(data) {
+  document.getElementById('chat-view').classList.remove('active');
+  document.getElementById('score-view').classList.add('active');
+  const scoreColor = data.score >= 8 ? '#639922' : data.score >= 5 ? '#BA7517' : '#E24B4A';
+  const scoreLabel = data.score >= 8 ? 'Great job!' : data.score >= 5 ? 'Good effort' : 'Keep practicing';
+  const strengthsHTML = (data.strengths || []).map(s => '<div class="feedback-item"><div class="fi-dot fi-green"></div>' + s + '</div>').join('');
+  const improvementsHTML = (data.improvements || []).map(s => '<div class="feedback-item"><div class="fi-dot fi-red"></div>' + s + '</div>').join('');
+  document.getElementById('score-panel').innerHTML =
+    '<div class="score-header"><div class="score-num" style="color:' + scoreColor + '">' + data.score + '<span class="score-denom">/10</span></div><div class="score-label">' + scoreLabel + '</div></div>' +
+    '<div class="feedback-section"><div class="feedback-title">What you did well</div>' + (strengthsHTML || '<div class="feedback-item" style="color:#aaa;">Keep practicing to build strengths</div>') + '</div>' +
+    '<div class="feedback-section"><div class="feedback-title">Areas to improve</div>' + (improvementsHTML || '<div class="feedback-item" style="color:#aaa;">None noted</div>') + '</div>' +
+    '<div class="feedback-section"><div class="feedback-title">Coach summary</div><div style="font-size:13px;line-height:1.6;color:#1a1a1a;">' + (data.summary || '') + '</div></div>' +
+    '<button class="retry-btn" onclick="startRoleplay()">Try again</button>';
+}
+</script>
+</body>
+</html>
